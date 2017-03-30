@@ -26,9 +26,7 @@ public class GameView extends SurfaceView implements Runnable {
     private Paint paint;
     private Canvas canvas;
     private SurfaceHolder surfaceHolder;
-    private Enemy[] enemies;
-    //设置敌人的数量
-    private int enemyCount = 1;
+    private Enemy enemies;
     private Friend friend;
     private ArrayList<Star> stars = new ArrayList<Star>();
     private Boom boom;
@@ -58,10 +56,7 @@ public class GameView extends SurfaceView implements Runnable {
             stars.add(s);
         }
         //初始化敌人数组
-        enemies = new Enemy[enemyCount];
-        for (int i = 0; i < enemyCount; i++){
-            enemies[i] = new Enemy(context,screenX,screenY);
-        }
+        enemies = new Enemy(context,screenX,screenY);
         boom = new Boom(context);
         friend = new Friend(context, screenX, screenY);
         this.screenX = screenX;
@@ -101,79 +96,71 @@ public class GameView extends SurfaceView implements Runnable {
         for(Star s:stars){
             s.update(player.getSpeed());
         }
-        //!这里是仅仅只放一个敌人的情况，后续若是多个敌人，需要改动！！！！！！！
-        //！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
-        if(enemies[0].getX() == screenX){
-            flag = true;
+        enemies.update(player.getSpeed());
+        //如果玩家与敌人相遇，那么将敌人移动到视野之外
+        if (Rect.intersects(player.getDetectCollision(),enemies.getDetectCollision())){
+            //将爆炸放置在敌人的位置
+            boom.setX(enemies.getX());
+            boom.setY(enemies.getY());
+            enemies.setX(-300);
+            score++;
+            killedEnemysound.start();
+        }else {
+            if (player.getDetectCollision().exactCenterX() > enemies.getDetectCollision().exactCenterX() ){
+                countMisses++;
+                if (countMisses == 3){
+                    playing = false;
+                    isGameOver = true;
+                    gameOnSound.stop();
+                    gameOversound.start();
+                    highScore[4] = score;
+                    outer:
+                    for (int j=4; j>0; j--){
+                        if (highScore[j] > highScore[j-1]){
+                            int temp = highScore[j];
+                            highScore[j] = highScore[j-1];
+                            highScore[j-1]= temp;
+                        }else {
+                            break outer;
+                        }
+                    }
+                    SharedPreferences.Editor e = sharedPreferences.edit();
+                    for (int k = 0; k < 4; k++){
+                        int j = k + 1;
+                        e.putInt("score"+j,highScore[k]);
+                    }
+                    //提交存储的数据
+                    e.apply();
+                }
+            }
         }
-        for (int i = 0; i < enemyCount; i++){
-            enemies[i].update(player.getSpeed());
-            //如果玩家与敌人相遇，那么将敌人移动到视野之外
-            if (Rect.intersects(player.getDetectCollision(),enemies[i].getDetectCollision())){
-                //将爆炸放置在敌人的位置
-                boom.setX(enemies[i].getX());
-                boom.setY(enemies[i].getY());
-                enemies[i].setX(-300);
-                score++;
-                killedEnemysound.start();
-            }else {
-                if (player.getDetectCollision().exactCenterX() > enemies[i].getDetectCollision().exactCenterX() ){
-                    countMisses++;
-                    flag = false;
-                    if (countMisses == 3){
-                        playing = false;
-                        isGameOver = true;
-                        gameOnSound.stop();
-                        gameOversound.start();
-                        if (score > highScore[3]){
-                            highScore[3] = score;
-                        }
-                        for (int j = 3; j > -1; j--){
-                            if (score > highScore[j]){
-                                highScore[j+1] = highScore[j];
-                            }else {
-                                highScore[j+1] = score;
-                                break;
-                            }
-                        }
-                        SharedPreferences.Editor e = sharedPreferences.edit();
-                        for (int k = 0; k < 4; k++){
-                            int j = k + 1;
-                            e.putInt("score"+j,highScore[k]);
-                        }
-                        //提交存储的数据
-                        e.apply();
-                    }
+        friend.update(player.getSpeed());
+        if (Rect.intersects(player.getDetectCollision(),friend.getDetectCollision())){
+            //将爆炸放置在敌人的位置
+            boom.setX(friend.getX());
+            boom.setY(friend.getY());
+            playing = false;
+            isGameOver = true;
+            gameOnSound.stop();
+            gameOversound.start();
+            highScore[4] = score;
+            outer:
+            for (int j=4; j>0; j--){
+                if (highScore[j] > highScore[j-1]){
+                    int temp = highScore[j];
+                    highScore[j] = highScore[j-1];
+                    highScore[j-1]= temp;
+                }else {
+                    break outer;
                 }
             }
-            friend.update(player.getSpeed());
-            if (Rect.intersects(player.getDetectCollision(),friend.getDetectCollision())){
-                //将爆炸放置在敌人的位置
-                boom.setX(friend.getX());
-                boom.setY(friend.getY());
-                playing = false;
-                isGameOver = true;
-                gameOnSound.stop();
-                gameOversound.start();
-                if (score > highScore[3]){
-                    highScore[3] = score;
-                }
-                for (int j = 3; j > -1; j--){
-                    if (score > highScore[j]){
-                        highScore[j+1] = highScore[j];
-                    }else {
-                        highScore[j+1] = score;
-                        break;
-                    }
-                }
-                SharedPreferences.Editor e = sharedPreferences.edit();
-                for (int k = 0; k < 4; k++){
-                    int j = k + 1;
-                    e.putInt("score"+j,highScore[k]);
-                }
-                //提交存储的数据
-                e.apply();
+            SharedPreferences.Editor e = sharedPreferences.edit();
+            for (int k = 0; k < 4; k++){
+                int j = k + 1;
+                e.putInt("score"+j,highScore[k]);
             }
+            //提交存储的数据
+            e.apply();
         }
     }
     private void draw(){
@@ -194,9 +181,7 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawText("Score:"+score,100,50,paint);
             canvas.drawBitmap(player.getBitmap(),player.getX(),player.getY(),paint);
             //绘制敌人
-            for (int i = 0; i < enemyCount; i++){
-                canvas.drawBitmap(enemies[i].getBitmap(),enemies[i].getX(),enemies[i].getY(),paint);
-            }
+            canvas.drawBitmap(enemies.getBitmap(),enemies.getX(),enemies.getY(),paint);
             canvas.drawBitmap(boom.getBitmap(),boom.getX(),boom.getY(),paint);
             canvas.drawBitmap(friend.getBitmap(),friend.getX(),friend.getY(),paint);
             //当游戏结束时，显示game over字样
