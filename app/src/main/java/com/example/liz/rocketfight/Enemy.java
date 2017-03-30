@@ -23,7 +23,7 @@ public class Enemy {
     private int minY;
     private Rect detectCollision;
     public Enemy(Context context, int screenX, int screenY){
-        bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.enemy);
+        bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.burger);
         maxX = screenX;
         maxY = screenY;
         minX = 0;
@@ -32,7 +32,7 @@ public class Enemy {
         Random generator = new Random();
         speed = generator.nextInt(6) + 10;
         x = screenX;
-        maxY = generator.nextInt(maxY) - bitmap.getHeight();
+        y = generator.nextInt(maxY) - bitmap.getHeight();
         detectCollision = new Rect(x,y,bitmap.getWidth(),bitmap.getHeight());
     }
     public void update(int playerSpeed){

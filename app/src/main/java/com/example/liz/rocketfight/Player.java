@@ -27,7 +27,7 @@ public class Player {
         y = 50;
         speed = -1;
         //加载位图文件
-        bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.player);
+        bitmap = BitmapFactory.decodeResource(context.getResources(),R.drawable.tray);
         boosting = false;
         detectCollision = new Rect(x,y,bitmap.getWidth(),bitmap.getHeight());
         maxY = screenY - bitmap.getHeight();

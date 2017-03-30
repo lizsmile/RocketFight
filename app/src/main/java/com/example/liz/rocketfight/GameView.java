@@ -38,7 +38,7 @@ public class GameView extends SurfaceView implements Runnable {
     private boolean isGameOver;
     int score;
     //存放4个分数的数组
-    int highScore[] = new int[4];
+    int highScore[] = new int[5];
     //将分数存在shared preference
     SharedPreferences sharedPreferences;
     static MediaPlayer gameOnSound;
@@ -74,10 +74,11 @@ public class GameView extends SurfaceView implements Runnable {
         highScore[1] = sharedPreferences.getInt("score2",0);
         highScore[2] = sharedPreferences.getInt("score3",0);
         highScore[3] = sharedPreferences.getInt("score4",0);
+        highScore[4] = sharedPreferences.getInt("score5",0);
         //初始化音效
-        gameOnSound = MediaPlayer.create(context,R.raw.gameon);
-        killedEnemysound = MediaPlayer.create(context,R.raw.killedenemy);
-        gameOversound = MediaPlayer.create(context,R.raw.gameover);
+        gameOnSound = MediaPlayer.create(context,R.raw.nyan);
+        killedEnemysound = MediaPlayer.create(context,R.raw.boom2);
+        gameOversound = MediaPlayer.create(context,R.raw.gameover1);
         gameOnSound.start();
         this.context = context;
     }
@@ -124,11 +125,11 @@ public class GameView extends SurfaceView implements Runnable {
                         isGameOver = true;
                         gameOnSound.stop();
                         gameOversound.start();
-                        for (int j = 0; j < 4; j++){
-                            if(highScore[i] < score){
-                                final int finalI = j;
-                                highScore[j] = score;
-                                //当找到符合条件的分数时，就跳出循环
+                        for (int j = 3; j > -1; j--){
+                            if (score > highScore[j]){
+                                highScore[j+1] = highScore[j];
+                            }else {
+                                highScore[j+1] = score;
                                 break;
                             }
                         }
@@ -151,11 +152,11 @@ public class GameView extends SurfaceView implements Runnable {
                 isGameOver = true;
                 gameOnSound.stop();
                 gameOversound.start();
-                for (int j = 0; j < 4; j++){
-                    if(highScore[i] < score){
-                        final int finalI = j;
-                        highScore[j] = score;
-                        //当找到符合条件的分数时，就跳出循环
+                for (int j = 3; j > -1; j--){
+                    if (score > highScore[j]){
+                        highScore[j+1] = highScore[j];
+                    }else {
+                        highScore[j+1] = score;
                         break;
                     }
                 }
