@@ -32,7 +32,6 @@ public class GameView extends SurfaceView implements Runnable {
     private Boom boom;
     int screenX;
     int countMisses;
-    boolean flag;
     private boolean isGameOver;
     int score;
     //存放4个分数的数组
