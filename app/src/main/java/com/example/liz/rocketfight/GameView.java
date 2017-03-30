@@ -125,6 +125,9 @@ public class GameView extends SurfaceView implements Runnable {
                         isGameOver = true;
                         gameOnSound.stop();
                         gameOversound.start();
+                        if (score > highScore[3]){
+                            highScore[3] = score;
+                        }
                         for (int j = 3; j > -1; j--){
                             if (score > highScore[j]){
                                 highScore[j+1] = highScore[j];
@@ -152,6 +155,9 @@ public class GameView extends SurfaceView implements Runnable {
                 isGameOver = true;
                 gameOnSound.stop();
                 gameOversound.start();
+                if (score > highScore[3]){
+                    highScore[3] = score;
+                }
                 for (int j = 3; j > -1; j--){
                     if (score > highScore[j]){
                         highScore[j+1] = highScore[j];
